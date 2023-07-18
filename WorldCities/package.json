@@ -24,6 +24,7 @@
     "jest-editor-support": "*",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",
+    "typescript": "^4.4.3",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -32,12 +33,17 @@
     "@angular/compiler-cli": "~13.0.0",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "eslint-config-standard-with-typescript": "^36.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-promise": "^6.1.1",
     "jasmine-core": "~3.10.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "~1.7.0",
-    "typescript": "~4.4.3"
+    "karma-jasmine-html-reporter": "~1.7.0"
   }
 }

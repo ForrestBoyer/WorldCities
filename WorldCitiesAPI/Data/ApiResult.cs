@@ -46,6 +46,8 @@ namespace WorldCitiesAPI.Data
 
         public static async Task<ApiResult<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize, string? sortColumn = null, string? sortOrder = null, string? filterColumn = null, string? filterQuery = null)
         {
+            // Edit query to have filter
+            // Adds WHERE filterColumn like 'filterQuery%'
             if (!string.IsNullOrEmpty(filterColumn) && !string.IsNullOrEmpty(filterQuery) && IsValidProperty(filterColumn))
             {
                 source = source.Where($"{filterColumn}.StartsWith(@0)", filterQuery);
@@ -53,6 +55,8 @@ namespace WorldCitiesAPI.Data
 
             var count = await source.CountAsync();
 
+            // Adds sort to query
+            // ORDER BY sortColumn sortOrder
             if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn))
             {
                 sortOrder = !string.IsNullOrEmpty(sortOrder) && sortOrder.ToUpper() == "ASC" ? "ASC" : "DESC";
@@ -61,6 +65,8 @@ namespace WorldCitiesAPI.Data
                     .OrderBy($"{sortColumn} {sortOrder}");
             }
 
+            // Gets the right pages
+            // OFFSET pageIndex * pageSize
             source = source
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize);
