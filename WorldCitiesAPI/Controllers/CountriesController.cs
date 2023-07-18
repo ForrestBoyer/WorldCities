@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -94,6 +94,14 @@ namespace WorldCitiesAPI.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetCountry", new { id = country.Id }, country);
+        }
+
+        // POST api/countries/isdupefield
+        [HttpPost]
+        [Route("IsDupeField")]
+        public bool IsDupeField(int countryId, string fieldName, string fieldValue)
+        {
+            return ApiResult<Country>.IsValidProperty(fieldName, true) && _context.Countries.Any($"{fieldName} == @0 && Id != @1",  fieldValue, countryId);
         }
 
         // DELETE: api/Countries/5

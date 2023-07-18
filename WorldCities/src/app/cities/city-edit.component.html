@@ -2,6 +2,8 @@
     <h1>{{ title }}</h1>
     <p *ngIf="this.id && !city"><em>Loading...</em></p>
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!--Name-->
         <mat-form-field>
             <mat-label>Name:</mat-label>
             <input matInput formControlName="name" required placeholder="Type a name" />
@@ -9,6 +11,8 @@
                 Name is Required
             </mat-error>
         </mat-form-field>
+
+        <!--Latitude-->
         <mat-form-field>
             <mat-label>Latitude:</mat-label>
             <input matInput formControlName="lat" required placeholder="Insert Latitude" />
@@ -16,6 +20,8 @@
                 Latitude is Required
             </mat-error>
         </mat-form-field>
+
+        <!--Longitude-->
         <mat-form-field>
             <mat-label>Longitude:</mat-label>
             <input matInput formControlName="lon" required placeholder="Insert Longitude" />
@@ -23,6 +29,8 @@
                 Longitude is Required
             </mat-error>
         </mat-form-field>
+
+        <!--Country-->
         <p *ngIf="countries">
             <select id="countryId" formControlName="countryId">
                 <option value="">--- Select a country ---</option>
@@ -34,13 +42,20 @@
         <mat-error *ngIf="this.form.controls['countryId'].errors?.['required']">
             Please select a country.
         </mat-error>
+
         <div>
-            <button mat-flat-button color="primary" type="submit">
+            <button mat-flat-button color="primary" type="submit" [disabled]="!form.valid">
                 {{ this.id ? "Save" : "Create" }}
             </button>
             <button mat-flat-button color="secondary" [routerLink]="['/cities']">
                 Cancel
             </button>
         </div>
+        <p>
+            <mat-error *ngIf="form.invalid && form.hasError('isDupeCity')">
+                <strong>ERROR</strong>
+                A city with the same <i>name</i>, <i>lat</i>, <i>lon</i>, and <i>country</i> already exists.
+            </mat-error>
+        </p>
     </form>
 </div>
