@@ -1,14 +1,14 @@
 <div class="city-edit">
     <h1>{{ title }}</h1>
     <p *ngIf="this.id && !city"><em>Loading...</em></p>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="city">
 
         <!--Name-->
         <mat-form-field>
             <mat-label>Name:</mat-label>
             <input matInput formControlName="name" required placeholder="Type a name" />
-            <mat-error *ngIf="this.form.controls['name'].errors?.['required']">
-                Name is Required
+            <mat-error *ngFor="let error of getErrors(form.get('name')!, 'Name')">
+                {{ error }}
             </mat-error>
         </mat-form-field>
 
@@ -16,8 +16,10 @@
         <mat-form-field>
             <mat-label>Latitude:</mat-label>
             <input matInput formControlName="lat" required placeholder="Insert Latitude" />
-            <mat-error *ngIf="this.form.controls['lat'].errors?.['required']">
-                Latitude is Required
+            <mat-error *ngFor="let error of getErrors(form.get('lat')!,
+                       'Latitude',
+                       { 'pattern' : 'requires a positive or negative number with 0-4 decimal values' })">
+                {{ error }}
             </mat-error>
         </mat-form-field>
 
@@ -25,8 +27,10 @@
         <mat-form-field>
             <mat-label>Longitude:</mat-label>
             <input matInput formControlName="lon" required placeholder="Insert Longitude" />
-            <mat-error *ngIf="this.form.controls['lon'].errors?.['required']">
-                Longitude is Required
+            <mat-error *ngFor="let error of getErrors(form.get('lon')!,
+                       'Longitude',
+                       { 'pattern' : 'requires a positive or negative number with 0-4 decimal values' })">
+                {{ error }}
             </mat-error>
         </mat-form-field>
 
@@ -39,8 +43,8 @@
                 </option>
             </select>
         </p>
-        <mat-error *ngIf="this.form.controls['countryId'].errors?.['required']">
-            Please select a country.
+        <mat-error *ngFor="let error of getErrors(form.get('countryId')!, 'countryId')">
+            {{ error }}
         </mat-error>
 
         <div>
@@ -59,3 +63,36 @@
         </p>
     </form>
 </div>
+
+<!--FORM ACTIVIT PANEL-->
+<!--<div class="info">
+    <div class="info-header">Form Debug Info</div>
+    <div class="info-body">
+        <div class="info-label">
+            Form Value:
+        </div>
+        <div class="info-value">
+            {{ form.value | json }}
+        </div>
+        <hr/>
+        <div class="info-label">
+            Form Status:
+        </div>
+        <div class="info-value">
+            {{ form.status | json }}
+        </div>
+    </div>
+</div>
+
+<!--FORM ACTIVITY LOG PANEL-->
+<!--<div class="info">
+    <div class="info-header">Form Activity</div>
+    <div class="info-body">
+        <div class="info-value">
+            <span *ngIf="activityLog"
+                   [innerHTML]="activityLog">
+            </span>
+        </div>
+    </div>
+</div>
+-->

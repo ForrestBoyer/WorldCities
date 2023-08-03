@@ -1,41 +1,88 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
 import { ActivatedRoute, Router } from "@angular/router";
 import { FormGroup, FormControl, Validators, AbstractControl, AsyncValidatorFn } from "@angular/forms";
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from "./../../environments/environment";
 import { City } from "./city";
 import { Country } from "./../countries/country";
+import { BaseFormComponent } from '../base-form.component'
+import { CityService } from './city.service'
+import { ApiResult } from '../base.service'
 
 @Component({
     selector: "app-city-edit",
     templateUrl: "./city-edit.component.html",
     styleUrls: ["./city-edit.component.scss"],
 })
-export class CityEditComponent implements OnInit {
+export class CityEditComponent extends BaseFormComponent implements OnInit {
+    private subscriptions: Subscription = new Subscription();
+
     title?: string;
-    form!: FormGroup;
     city?: City;
     id?: number;
     countries?: Country[];
 
+    // Activity Log (For Debugging)
+    //activityLog: string = '';
+
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
-        private http: HttpClient
-    ) {}
+        private cityService: CityService
+    )
+    {
+      super();
+    }
 
     ngOnInit(): void {
         this.form = new FormGroup({
             name: new FormControl("", Validators.required),
-            lat: new FormControl("", Validators.required),
-            lon: new FormControl("", Validators.required),
+            lat: new FormControl("", [
+                Validators.required,
+                Validators.pattern(/^[-]?[0-9]+(\.[0-9]{1,4})?$/)
+            ]),
+            lon: new FormControl("", [
+                Validators.required,
+                Validators.pattern(/^[-]?[0-9]+(\.[0-9]{1,4})?$/)
+            ]),
             countryId: new FormControl("", Validators.required),
         }, null, this.isDupeCity());
 
+      this.subscriptions
+        .add(this.form.valueChanges
+            .subscribe(() => {
+                if (!this.form.dirty) {
+                    this.log("Form Model has been loaded");
+                }
+                else {
+                    this.log("Form was updated by the user");
+                }
+            }));
+
+      this.subscriptions
+        .add(this.form.get("name")!.valueChanges
+            .subscribe(() => {
+                if (!this.form.dirty)
+                {
+                    this.log("Name has been loaded with initial values");
+                }
+                else
+                {
+                    this.log("Name was updated by the user");
+                }
+            }));
+
         this.loadData();
+    }
+
+    ngOnDestroy() {
+      this.subscriptions.unsubscribe();
+    }
+
+    log(str: string) {
+      console.log("[" + new Date().toLocaleString() + "] " + str);
     }
 
     loadData() {
@@ -46,83 +93,78 @@ export class CityEditComponent implements OnInit {
 
         if (this.id) {
             // EDIT MODE
-            const url = environment.baseUrl + "api/cities/" + this.id;
-            this.http.get<City>(url).subscribe(
-                (result) => {
-                    this.city = result;
-                    this.title = "Edit - " + this.city.name;
+          this.cityService.get(this.id)
+            .subscribe(result => {
+                this.city = result;
+                this.title = "Edit - " + this.city.name;
 
-                    this.form.patchValue(this.city);
-                },
-                (error) => console.error(error)
-            );
-        } else {
+                this.form.patchValue(this.city);
+            }, error => console.error(error));
+        }
+        else
+        {
             // ADD MODE
             this.title = "Create a new City";
         }
     }
 
-    loadCountries() {
-        const url = environment.baseUrl + "api/countries";
-        const params = new HttpParams()
-            .set("pageIndex", "0")
-            .set("pageSize", "9999")
-            .set("sortColumn", "name");
+      loadCountries() {
+        this.cityService.getCountries(
+          0,
+          9999,
+          "name",
+          "asc",
+          null,
+          null
+        ).subscribe(result => {
+            this.countries = result.data;
+        }, error => console.error(error));
+      }
 
-        this.http.get<any>(url, { params }).subscribe(
-            (result) => {
-                this.countries = result.data;
-            },
-            (error) => console.error(error)
-        );
+    onSubmit() {
+        var city = this.id ? this.city : {} as City;
+        if (city) { 
+            city.name = this.form.controls["name"].value;
+            city.lat = +this.form.controls["lat"].value;
+            city.lon = +this.form.controls["lon"].value;
+            city.countryId = +this.form.controls["countryId"].value;
+
+            if (this.id) {
+                // EDIT MODE
+                this.cityService.put(city).subscribe(
+                    (result) => {
+                        console.log("City " + city!.id + " has been updated.");
+                        this.router.navigate(["/cities"]);
+                    },
+                    (error) => console.error(error)
+                );
+            } else {
+                // ADD MODE
+                this.cityService.post(city).subscribe(
+                    (result) => {
+                        console.log("City" + result.id + " has been created.");
+                        this.router.navigate(["/cities"]);
+                    },
+                    (error) => console.error(error)
+                );
+            }
+        }
     }
 
-  onSubmit() {
-      var city = this.id ? this.city : {} as City;
-      if (city) { 
+    isDupeCity(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {
+          var city = {} as City;
+
+          city.id = (this.id) ? this.id : 0;
           city.name = this.form.controls["name"].value;
           city.lat = +this.form.controls["lat"].value;
           city.lon = +this.form.controls["lon"].value;
           city.countryId = +this.form.controls["countryId"].value;
 
-          if (this.id) {
-              // EDIT MODE
-              var url = environment.baseUrl + "api/cities/" + city.id;
-              this.http.put<City>(url, city).subscribe(
-                  (result) => {
-                      console.log("City " + city!.id + " has been updated.");
-                      this.router.navigate(["/cities"]);
-                  },
-                  (error) => console.error(error)
-              );
-          } else {
-              // ADD MODE
-              var url = environment.baseUrl + "api/cities";
-              this.http.post<City>(url, city).subscribe(
-                  (result) => {
-                      console.log("City" + result.id + " has been created.");
-                      this.router.navigate(["/cities"]);
-                  },
-                  (error) => console.error(error)
-              );
-          }
-      }
-  }
-
-  isDupeCity(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {
-      var city = {} as City;
-
-      city.id = (this.id) ? this.id : 0;
-      city.name = this.form.controls["name"].value;
-      city.lat = +this.form.controls["lat"].value;
-      city.lon = +this.form.controls["lon"].value;
-      city.countryId = +this.form.controls["countryId"].value;
-
-      var url = environment.baseUrl + 'api/cities/isdupecity';
-      return this.http.post<boolean>(url, city).pipe(map(result => {
-        return (result) ? { isDupeCity: true } : null;
-      }));
+          return this.cityService.isDupeCity(city)
+            .pipe(map(result => {
+              return (result) ? { isDupeCity: true } : null;
+            }));
+        }
     }
-  }
 }
