@@ -62,8 +62,7 @@ export class CityService extends BaseService<City> {
     filterColumn: string | null,
     filterQuery: string | null
   ): Observable<ApiResult<Country>> {
-    var url = this.getUrl("api.countries");
-    var params = new HttpParams()
+    var url = this.getUrl("api/countries");
     var params = new HttpParams()
       .set("pageIndex", pageIndex.toString())
       .set("pageSize", pageSize.toString())

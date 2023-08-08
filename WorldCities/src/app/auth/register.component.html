@@ -1,0 +1,38 @@
+<div class="register">
+    <h1>Register</h1>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <p>
+            <mat-error *ngIf="registerResult && !registerResult.success">
+                <strong>ERROR</strong>: {{ registerResult.message }}
+            </mat-error>
+        </p>
+
+        <!--NAME-->
+        <mat-form-field>
+            <input matInput formControlName="email" required placeholder="Insert Email" />
+            <mat-error *ngFor="let error of getErrors(form.get('email')!, 'Email')">
+                {{ error }}
+            </mat-error>
+        </mat-form-field>
+
+        <!--Password-->
+        <mat-form-field>
+            <mat-label>Password:</mat-label>
+            <input matInput formControlName="password" type="password" required placeholder="Insert Password" />
+            <mat-error *ngFor="let error of getErrors(form.get('password')!, 'Password')">
+                {{ error }}
+            </mat-error>
+        </mat-form-field>
+
+        <div class="button-group">
+            <button mat-flat-button color="primary" type="submit" [disabled]="!form.valid">
+                Register
+            </button>
+            <button mat-flat-button color="secondary" [routerLink]="['/']">
+                Cancel
+            </button>
+        </div>
+
+    </form>
+</div>

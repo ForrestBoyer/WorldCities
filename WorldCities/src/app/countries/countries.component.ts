@@ -9,6 +9,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { Country } from './country'
 import { CountryService } from './country.service'
 import { ApiResult } from '../base.service'
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-countries',
@@ -32,7 +33,7 @@ export class CountriesComponent implements OnInit {
 
   filterTextChanged: Subject<string> = new Subject<string>();
 
-  constructor(private countryService: CountryService) { }
+  constructor(private countryService: CountryService, public authService: AuthService) { }
 
   ngOnInit(): void {
     this.loadData();

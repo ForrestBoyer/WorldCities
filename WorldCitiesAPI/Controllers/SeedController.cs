@@ -5,11 +5,13 @@ using WorldCitiesAPI.Data;
 using WorldCitiesAPI.Data.Models;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WorldCitiesAPI.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    //[Authorize(Roles = "Administrator")]
     public class SeedController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -135,8 +137,6 @@ namespace WorldCitiesAPI.Controllers
                     UserName = email_Admin,
                     Email = email_Admin
                 };
-
-                await _userManager.CreateAsync(user_Admin, _configuration["DefaultPasswords:Administrator"]);
 
                 await _userManager.AddToRoleAsync(user_Admin, role_RegisteredUser);
                 await _userManager.AddToRoleAsync(user_Admin, role_Administrator);

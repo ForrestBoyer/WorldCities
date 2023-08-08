@@ -1,7 +1,7 @@
 <div class="city-edit">
     <h1>{{ title }}</h1>
     <p *ngIf="this.id && !city"><em>Loading...</em></p>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="city">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="city || !this.id">
 
         <!--Name-->
         <mat-form-field>

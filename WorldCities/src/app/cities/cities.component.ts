@@ -8,6 +8,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { City } from './city'
 import { CityService } from './city.service'
 import { ApiResult } from '../base.service'
+import { AuthService } from '../auth/auth.service'
 
 @Component({
   selector: 'app-cities',
@@ -31,7 +32,7 @@ export class CitiesComponent implements OnInit {
 
   filterTextChanged: Subject<string> = new Subject<string>();
 
-  constructor(private cityService: CityService) { }
+  constructor(private cityService: CityService, public authService: AuthService) { }
 
   ngOnInit(): void {
     this.loadData();

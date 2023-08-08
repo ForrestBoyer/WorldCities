@@ -45,5 +45,31 @@ namespace WorldCitiesAPI.Controllers
                 Token = jwt
             });
         }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(RegisterRequest registerRequest)
+        {
+            string role_RegisteredUser = "RegisteredUser";
+
+            var newUser = new ApplicationUser()
+            {
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = registerRequest.Email,
+                Email = registerRequest.Email
+            };
+
+            await _userManager.CreateAsync(newUser, registerRequest.Password);
+
+            await _userManager.AddToRoleAsync(newUser, role_RegisteredUser);
+
+            newUser.EmailConfirmed = true;
+            newUser.LockoutEnabled = false;
+
+            return Ok(new RegisterResult()
+            {
+                Success = true,
+                Message = "User Registered Successfully"
+            });
+        }
     }
 }

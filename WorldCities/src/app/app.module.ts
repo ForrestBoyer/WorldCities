@@ -1,4 +1,5 @@
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
+import { AuthInterceptor } from './auth/auth.interceptor'
 import { NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -14,6 +15,8 @@ import { CitiesComponent } from './cities/cities.component'
 import { CountriesComponent } from './countries/countries.component'
 import { CityEditComponent } from './cities/city-edit.component';
 import { CountryEditComponent } from './countries/country-edit.component';
+import { LoginComponent } from './auth/login.component';
+import { RegisterComponent } from './auth/register.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +27,8 @@ import { CountryEditComponent } from './countries/country-edit.component';
     CountriesComponent,
     CityEditComponent,
     CountryEditComponent,
+    LoginComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,7 +38,13 @@ import { CountryEditComponent } from './countries/country-edit.component';
     AngularMaterialModule,
     ReactiveFormsModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

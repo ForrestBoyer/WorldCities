@@ -81,8 +81,8 @@ export class CountryEditComponent extends BaseFormComponent implements OnInit {
 
       if (this.id) {
         // EDIT MODE
-        this.countryService.put(country).subscribe(
-          (result) => {
+        this.countryService.put(country)
+          .subscribe(result => {
             console.log("Country " + country!.id + " has been updated.");
             this.router.navigate(["/countries"]);
           },
